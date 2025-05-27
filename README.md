@@ -138,10 +138,119 @@ print("\n✅ Shape of DataFrame:", df.shape)
 
 ![image](https://github.com/user-attachments/assets/304537dc-13bb-4b6b-b6d1-857d728e5f9e)
 ![image](https://github.com/user-attachments/assets/297808d3-39f2-4476-a030-ddb9c1c98928)
-
 ![image](https://github.com/user-attachments/assets/e60d3938-dc20-4a77-8d2d-82815a94e0e7)
 
 
+# STEP 2
+![image](https://github.com/user-attachments/assets/43bc223e-94bc-46b1-9328-78bf9b15bdd5)
+
+# STEP 3
+![image](https://github.com/user-attachments/assets/d0c83fbc-6e8d-4ef4-b7fc-8409e3bc9a3f)
+# STEP 1: Read CSV from FileStore (Bronze Ingest)
+df_bronze = (
+    spark.read
+    .option("header", True)
+    .option("inferSchema", True)
+    .csv("/FileStore/tables/cryptodata-3.csv")
+)
+
+ STEP 2: Show a few rows to verify
+df_bronze.show(5)
+
+ STEP 3: Write to Bronze Delta Lake folder
+df_bronze.write.format("delta").mode("overwrite").save("/mnt/bronze/cryptodata_bronze")
+
+ STEP 4 (Optional): Register as a SQL table
+spark.sql("DROP TABLE IF EXISTS cryptodata_bronze")
+spark.sql("""
+CREATE TABLE cryptodata_bronze
+USING DELTA
+LOCATION '/mnt/bronze/cryptodata_bronze'
+""")
+
+
+
+# STEP 3
+![image](https://github.com/user-attachments/assets/64f8a92f-55aa-46d1-9447-bc7d6071cd4f)
+
+
+df_silver = spark.read.format("delta").load("/mnt/bronze/cryptodata_bronze")
+
+from pyspark.sql.functions import col
+
+ Drop rows with any nulls (adjust based on your logic)
+df_silver_cleaned = df_silver.dropna()
+
+Optional: Convert data types if needed (example: timestamp)
+ df_silver_cleaned = df_silver_cleaned.withColumn("timestamp_col", col("timestamp_col").cast("timestamp"))
+
+ Optional: Drop unwanted columns (example)
+ df_silver_cleaned = df_silver_cleaned.drop("unnecessary_column")
+
+
+df_silver_cleaned.printSchema()
+df_silver_cleaned.show(5)
+
+
+df_silver_cleaned.write.format("delta").mode("overwrite").save("/mnt/silver/cryptodata_silver")
+
+spark.sql("DROP TABLE IF EXISTS cryptodata_silver")
+spark.sql("""
+CREATE TABLE cryptodata_silver
+USING DELTA
+LOCATION '/mnt/silver/cryptodata_silver'
+""")
+
+
+# STEP 4
+![image](https://github.com/user-attachments/assets/febc2d45-d1d9-4fe5-a2f9-6276e9d37deb)
+df_silver = spark.read.format("delta").load("/mnt/silver/cryptodata_silver")
+
+# Example: Total transaction volume by crypto type
+from pyspark.sql.functions import sum, avg, count
+
+df_gold = df_silver.groupBy("Cryptocurrency") \
+                   .agg(
+                       count("*").alias("Total_Transactions"),
+                       sum("Transaction_Amount").alias("Total_Volume"),
+                       avg("Transaction_Amount").alias("Average_Amount")
+                   ) \
+                   .orderBy("Total_Transactions", ascending=False)
+
+df_gold.show()
+
+df_gold.write.format("delta").mode("overwrite").save("/mnt/gold/cryptodata_gold")
+
+spark.sql("DROP TABLE IF EXISTS cryptodata_gold")
+spark.sql("""
+CREATE TABLE cryptodata_gold
+USING DELTA
+LOCATION '/mnt/gold/cryptodata_gold'
+""")
+
+## UPDATED CODE
+df_silver = spark.read.format("delta").load("/mnt/silver/cryptodata_silver")
+
+from pyspark.sql.functions import sum, avg, count
+
+df_gold = df_silver.groupBy("Currency") \
+                   .agg(
+                       count("*").alias("Total_Transactions"),
+                       sum("Amount").alias("Total_Volume"),
+                       avg("Amount").alias("Average_Amount")
+                   ) \
+                   .orderBy("Total_Transactions", ascending=False)
+
+df_gold.show()
+
+df_gold.write.format("delta").mode("overwrite").save("/mnt/gold/cryptodata_gold")
+
+spark.sql("DROP TABLE IF EXISTS cryptodata_gold")
+spark.sql("""
+CREATE TABLE cryptodata_gold
+USING DELTA
+LOCATION '/mnt/gold/cryptodata_gold'
+""")
 
 
 
