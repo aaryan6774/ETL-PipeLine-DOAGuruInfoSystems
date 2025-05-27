@@ -66,7 +66,11 @@ null/missing data counts
 
 
 
-![image](https://github.com/user-attachments/assets/361969d9-59b2-4abf-b34f-e31904661887)
+
+
+# FILE STRUCTURE
+![image](https://github.com/user-attachments/assets/71eb0791-d2b7-48ab-9b8e-d58dce63c67a)
+
 
 
 
