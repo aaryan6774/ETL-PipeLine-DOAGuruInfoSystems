@@ -253,6 +253,12 @@ LOCATION '/mnt/gold/cryptodata_gold'
 """)
 
 
+# BRONZE SILVER GOLD RESOURCE
+https://chatgpt.com/c/68354d1d-4698-8011-8ef0-931f372800dc
+
+
+
+
 
 
 
