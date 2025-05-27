@@ -258,7 +258,97 @@ https://chatgpt.com/c/68354d1d-4698-8011-8ef0-931f372800dc
 
 
 
+![image](https://github.com/user-attachments/assets/4c1ac1f5-69ca-45ed-935f-4ee3ff33fb96)
+# full_etl_pipeline
 
+# ---------------------------------
+# Bronze Layer Logic
+# ---------------------------------
+def bronze_layer():
+    print("Running Bronze Layer...")
+    # Your actual Bronze logic here
+    # Example:
+    df_bronze = spark.read.csv("/FileStore/raw_data.csv", header=True, inferSchema=True)
+    df_bronze.write.format("delta").mode("overwrite").save("/tmp/bronze_table")
+    print("Bronze layer complete.\n")
+
+# ---------------------------------
+# Silver Layer Logic
+# ---------------------------------
+def silver_layer():
+    print("Running Silver Layer...")
+    df_bronze = spark.read.format("delta").load("/tmp/bronze_table")
+    df_silver = df_bronze.dropna()
+    df_silver.write.format("delta").mode("overwrite").save("/tmp/silver_table")
+    print("Silver layer complete.\n")
+
+# ---------------------------------
+# Gold Layer Logic
+# ---------------------------------
+def gold_layer():
+    print("Running Gold Layer...")
+    df_silver = spark.read.format("delta").load("/tmp/silver_table")
+    df_gold = df_silver.groupBy("some_column").count()
+    df_gold.write.format("delta").mode("overwrite").save("/tmp/gold_table")
+    print("Gold layer complete.\n")
+
+# ---------------------------------
+# Run the ETL pipeline
+# ---------------------------------
+bronze_layer()
+silver_layer()
+gold_layer()
+
+print("✅ Full ETL pipeline executed successfully.")
+
+
+# ✅ Full ETL pipeline for Databricks Community Edition
+
+# ------------------------------
+# Bronze Layer
+# ------------------------------
+def bronze_layer():
+    print("🔁 Running Bronze Layer...")
+    df_bronze = spark.read.csv("/FileStore/tables/cryptodata-3.csv", header=True, inferSchema=True)
+    df_bronze.write.format("delta").mode("overwrite").save("/tmp/bronze_table")
+    print("✅ Bronze layer complete.\n")
+
+# ------------------------------
+# Silver Layer
+# ------------------------------
+def silver_layer():
+    print("🔁 Running Silver Layer...")
+    df_bronze = spark.read.format("delta").load("/tmp/bronze_table")
+    df_silver = df_bronze.dropna()
+    df_silver.write.format("delta").mode("overwrite").save("/tmp/silver_table")
+    print("✅ Silver layer complete.\n")
+
+# ------------------------------
+# Gold Layer
+# ------------------------------
+def gold_layer():
+    print("🔁 Running Gold Layer...")
+    df_silver = spark.read.format("delta").load("/tmp/silver_table")
+    
+    # Replace 'Currency' with another column if you want different aggregation
+    df_gold = df_silver.groupBy("Currency").count()
+    df_gold.write.format("delta").mode("overwrite").save("/tmp/gold_table")
+    
+    print("✅ Gold layer complete.\n")
+
+# ------------------------------
+# Run the Pipeline
+# ------------------------------
+bronze_layer()
+silver_layer()
+gold_layer()
+
+print("🏁 Full ETL pipeline executed successfully.")
+
+
+![image](https://github.com/user-attachments/assets/230888c2-6f03-4020-87ae-7358d96e0beb)
+![image](https://github.com/user-attachments/assets/4ff6c07b-7d4d-421c-b48c-0f8ade7c254e)
+![image](https://github.com/user-attachments/assets/c91e8100-4c01-4bc9-baa9-afe573e9cb0c)
 
 
 
