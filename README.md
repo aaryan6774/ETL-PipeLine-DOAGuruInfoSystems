@@ -71,6 +71,80 @@ null/missing data counts
 # FILE STRUCTURE
 ![image](https://github.com/user-attachments/assets/71eb0791-d2b7-48ab-9b8e-d58dce63c67a)
 
+![image](https://github.com/user-attachments/assets/1aa10b26-ad69-45b9-85a6-e1070bb8ded6)
+
+### Create a file named validate_csv.sh and paste the following:
+#!/bin/bash
+
+echo "================= STEP 1: Data File Validation ================="
+
+filename="cryptodata.csv"
+
+if [ ! -f "$filename" ]; then
+  echo "❌ Error: $filename not found!"
+  exit 1
+fi
+
+echo -e "\n✅ File Found: $filename"
+
+filesize=$(du -h "$filename" | cut -f1)
+rows=$(cat "$filename" | wc -l)
+cols=$(head -1 "$filename" | sed 's/[^,]//g' | wc -c)
+
+echo -e "\n📂 File Size      : $filesize"
+echo "🔢 Total Rows     : $((rows - 1)) (excluding header)"
+echo "🔢 Total Columns  : $((cols + 1))"
+
+echo -e "\n🧾 Column Names and Index:"
+head -1 "$filename" | tr ',' '\n' | nl
+
+echo -e "\n================= STEP 2: Summary with Python ================="
+python3 utils/data_summary.py "$filename"
+
+echo -e "\n================= ✅ VALIDATION COMPLETE ================="
+
+### Step 1.3: Create Python summary file data_summary.py
+![image](https://github.com/user-attachments/assets/02a7037d-8aa0-4864-aa64-9cb5268be4a6)
+import sys
+import pandas as pd
+
+filename = sys.argv[1]
+df = pd.read_csv(filename)
+
+print("\n📊 Data Types:")
+print(df.dtypes)
+
+print("\n🔍 Missing Values per Column:")
+print(df.isnull().sum())
+
+print("\n🔁 Duplicate Rows Count:")
+print(df.duplicated().sum())
+
+print("\n🧮 Unique Values per Column:")
+for col in df.columns:
+    print(f"{col}: {df[col].nunique()} unique")
+
+print("\n📌 Top 5 Rows:")
+print(df.head())
+
+print("\n📌 Bottom 5 Rows:")
+print(df.tail())
+
+print("\n🧠 Memory Usage:")
+print(df.memory_usage(deep=True))
+
+print("\n✅ Shape of DataFrame:", df.shape)
+
+
+![image](https://github.com/user-attachments/assets/304537dc-13bb-4b6b-b6d1-857d728e5f9e)
+![image](https://github.com/user-attachments/assets/297808d3-39f2-4476-a030-ddb9c1c98928)
+
+![image](https://github.com/user-attachments/assets/e60d3938-dc20-4a77-8d2d-82815a94e0e7)
+
+
+
+
+
 
 
 
