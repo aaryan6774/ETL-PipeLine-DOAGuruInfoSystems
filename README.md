@@ -27,7 +27,8 @@ Entire process should be automated and trackable, ideally using Databricks and s
 
 
 ## 🔄 Medallion Architecture Used
-### Layer	Data Quality	What You Store	Purpose
+### Layer	Data Quality	
+#### What You Store	Purpose
 Bronze	🔸 Raw	CSV as Delta	Never lose original data
 Silver	⚪ Cleaned	Valid rows	Prepare for business use
 Gold	🟡 Final	Aggregates	Used by management, ML
@@ -59,6 +60,11 @@ null/missing data counts
 3. Bronze-Silver-Gold Data Architecture	Save data in layers as it gets cleaned and transformed
 4. Quality checks	Validate raw data (duplicates, nulls, data types) before use
 5. Ready for analytics or ML	After cleaning, the final "Gold" data will be used by other teams (BI/ML)
+
+
+# taking messy raw data → validating it → cleaning it → storing it in layers (Bronze → Silver → Gold) → making it ready for analytics or ML.
+
+
 
 
 
